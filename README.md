@@ -2,17 +2,18 @@
 A CLI tool to extract core content from webpages or local HTML and convert it to Markdown.
 
 ```
-╭─ Commands ───────────────────────────────────────────────────────────────────────────────────────────────────────────╮
-│ --help (-h)  Display this message and exit.                                                                          │
-│ --version    Display application version.                                                                            │
-╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
-╭─ Parameters ─────────────────────────────────────────────────────────────────────────────────────────────────────────╮
-│ *  SOURCE --source                [required]                                                                         │
-│    --method                       [choices: readability, trafilatura, raw] [default: readability]                    │
-│    --favor                        [choices: recall, precision]                                                       │
-│    --remove-ads --no-remove-ads   [default: False]                                                                   │
-│    --strip-tag --empty-strip-tag                                                                                     │
-╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+╭─ Commands ────────────────────────────────────────────────────────────────────╮
+│ --help (-h)  Display this message and exit.                                   │
+│ --version    Display application version.                                     │
+╰───────────────────────────────────────────────────────────────────────────────╯
+╭─ Parameters ──────────────────────────────────────────────────────────────────╮
+│ *  SOURCE --source                [required]                                  │
+│    --method                       [choices: readability, trafilatura, raw]    │
+│                                   [default: readability]                      │
+│    --favor                        [choices: recall, precision]                │
+│    --remove-ads --no-remove-ads   [default: False]                            │
+│    --strip-tag --empty-strip-tag                                              │
+╰───────────────────────────────────────────────────────────────────────────────╯
 ```
 
 ## Installation
