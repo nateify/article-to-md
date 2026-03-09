@@ -2,18 +2,20 @@
 A CLI tool to extract core content from webpages or local HTML and convert it to Markdown.
 
 ```
-╭─ Commands ────────────────────────────────────────────────────────────────────╮
-│ --help (-h)  Display this message and exit.                                   │
-│ --version    Display application version.                                     │
-╰───────────────────────────────────────────────────────────────────────────────╯
-╭─ Parameters ──────────────────────────────────────────────────────────────────╮
-│ *  SOURCE --source                [required]                                  │
-│    --method                       [choices: readability, trafilatura, raw]    │
-│                                   [default: readability]                      │
-│    --favor                        [choices: recall, precision]                │
-│    --remove-ads --no-remove-ads   [default: False]                            │
-│    --strip-tag --empty-strip-tag                                              │
-╰───────────────────────────────────────────────────────────────────────────────╯
+Usage: article-to-md [OPTIONS] SOURCE
+
+Convert an article or web page to Markdown.
+
+Commands:
+  --help, -h: Display this message and exit.
+  --version: Display application version.
+
+Parameters:
+  SOURCE, --source: A URL or local HTML file to process. [required]
+  --method: The extraction engine to use. [choices: readability, trafilatura, raw] [default: readability]
+  --favor: Whether to favor 'precision' or 'recall' when using trafilatura. [choices: recall, precision]
+  --remove-ads, --no-remove-ads: Apply EasyList cosmetic filters to remove ads before processing. [default: False]
+  --strip-tag, --no-strip: HTML tag to strip from the final output. Repeat this flag to remove multiple tags. Use --no-strip to disable. [default: ('img',)]
 ```
 
 ## Installation
@@ -48,7 +50,7 @@ Advanced options:
 - `--favor` - Only used with `--method trafilatura` to control options [documented here](https://trafilatura.readthedocs.io/en/latest/usage-cli.html#optimizing-for-precision-and-recall).
 - `--strip-tag` - An HTML tag to be stripped from the DOM before conversion
   - This argument can be supplied multiple times 
-  - By default, `<img>` tags are stripped; use `--empty-strip-tag` to keep them.
+  - By default, `<img>` tags are stripped; use `--no-strip` to keep them.
 
 ## Features
 

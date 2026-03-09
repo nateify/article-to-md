@@ -2,12 +2,12 @@ import re
 import warnings
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Literal
+from typing import Annotated, Literal
 from urllib.parse import urlparse
 
 import curl_cffi
 from bs4 import BeautifulSoup, XMLParsedAsHTMLWarning
-from cyclopts import App
+from cyclopts import App, Parameter
 from readabilipy import simple_json_from_html_string
 from trafilatura import extract
 from unidecode import unidecode
@@ -21,7 +21,7 @@ warnings.filterwarnings("ignore", category=XMLParsedAsHTMLWarning)
 MethodChoice = Literal["readability", "trafilatura", "raw"]
 FavorChoice = Literal["recall", "precision"]
 
-app = App(help="Convert an article or web page to Markdown")
+app = App(help_formatter="plain")
 
 
 def create_filename_from_meta(soup: BeautifulSoup, url: str, title: str | None = None) -> str:
@@ -62,10 +62,24 @@ def main(
     method: MethodChoice = "readability",
     favor: FavorChoice | None = None,
     remove_ads: bool = False,
-    strip_tag: list[str] | None = None,
+    strip_tag: Annotated[tuple[str, ...], Parameter(negative="--no-strip")] = ("img",),
 ):
-    if strip_tag is None:
-        strip_tag = ["img"]
+    """
+    Convert an article or web page to Markdown.
+
+    Parameters
+    ----------
+    source : str
+        A URL or local HTML file to process.
+    method : MethodChoice, optional
+        The extraction engine to use.
+    favor : FavorChoice, optional
+        Whether to favor 'precision' or 'recall' when using trafilatura.
+    remove_ads : bool, optional
+        Apply EasyList cosmetic filters to remove ads before processing.
+    strip_tag : tuple[str, ...], optional
+        HTML tag to strip from the final output. Repeat this flag to remove multiple tags. Use --no-strip to disable.
+    """
 
     parsed = urlparse(source)
     is_url = all([parsed.scheme, parsed.netloc])

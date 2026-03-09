@@ -1,11 +1,13 @@
 [project]
 name = "article-to-md"
-version = "0.4.0"
+version = "0.4.1"
 description = "Convert an article or web page to Markdown"
 readme = "README.md"
 authors = [
     { name = "nateify", email = "nateify@users.noreply.github.com" }
 ]
+license = "MIT"
+license-files = ["LICENSE*"]
 requires-python = ">=3.13"
 keywords = ["markdown", "scraping", "extraction", "web scraping"]
 classifiers = [
@@ -14,7 +16,6 @@ classifiers = [
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.13",
-    "License :: OSI Approved :: MIT License",
     "Topic :: Utilities",
 ]
 dependencies = [
@@ -29,6 +30,11 @@ dependencies = [
     "trafilatura>=2.0.0",
     "unidecode>=1.4.0",
 ]
+
+[project.urls]
+Homepage = "https://github.com/nateify/article-to-md"
+Repository = "https://github.com/nateify/article-to-md.git"
+Issues = "https://github.com/nateify/article-to-md/issues"
 
 [project.scripts]
 article-to-md = "article_to_md.main:app"
