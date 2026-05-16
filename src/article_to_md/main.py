@@ -57,7 +57,8 @@ def create_filename_from_meta(soup: BeautifulSoup, url: str, title: str | None =
 
 @app.default
 def main(
-    source: str,
+    sources: list[str],
+    /,
     *,
     method: MethodChoice = "readability",
     favor: FavorChoice | None = None,
@@ -69,8 +70,8 @@ def main(
 
     Parameters
     ----------
-    source : str
-        A URL or local HTML file to process.
+    sources : list[str]
+        One or more URLs or paths to local HTML files.
     method : MethodChoice, optional
         The extraction engine to use.
     favor : FavorChoice, optional
@@ -81,64 +82,65 @@ def main(
         HTML tag to strip from the final output. Repeat this flag to remove multiple tags. Use --no-strip to disable.
     """
 
-    parsed = urlparse(source)
-    is_url = all([parsed.scheme, parsed.netloc])
+    for source in sources:
+        parsed = urlparse(source)
+        is_url = all([parsed.scheme, parsed.netloc])
 
-    if is_url:
-        url = source
-        request = curl_cffi.get(source, impersonate="chrome")
-        request.raise_for_status()
-        html = request.text
-    else:
-        path = Path(source)
-        url = path.name
-        if not path.exists():
-            print(f"Error: File or URL not found: {source}")
-            raise SystemExit(1)
+        if is_url:
+            url = source
+            request = curl_cffi.get(source, impersonate="chrome")
+            request.raise_for_status()
+            html = request.text
+        else:
+            path = Path(source)
+            url = path.name
+            if not path.exists():
+                print(f"Error: File or URL not found: {source}")
+                raise SystemExit(1)
 
-        html = path.read_text(encoding="utf-8")
+            html = path.read_text(encoding="utf-8")
 
-    soup = BeautifulSoup(html, "lxml")
+        soup = BeautifulSoup(html, "lxml")
 
-    if remove_ads:
-        soup = remove_by_cosmetic_filters(soup, get_easylist_filters())
+        if remove_ads:
+            soup = remove_by_cosmetic_filters(soup, get_easylist_filters())
 
-    title = content = None
+        title = content = None
 
-    if method == "readability":
-        article = simple_json_from_html_string(str(soup), use_readability=True)
-        title = article.get("title")
-        content = article.get("content")
+        if method == "readability":
+            article = simple_json_from_html_string(str(soup), use_readability=True)
+            title = article.get("title")
+            content = article.get("content")
 
-    if method == "trafilatura" or not content:
-        common_kwargs = {
-            "filecontent": str(soup),
-            "include_comments": False,
-            "output_format": "html",
-            "include_tables": True,
-            "deduplicate": True,
-        }
+        if method == "trafilatura" or not content:
+            common_kwargs = {
+                "filecontent": str(soup),
+                "include_comments": False,
+                "output_format": "html",
+                "include_tables": True,
+                "deduplicate": True,
+            }
 
-        dynamic_kwargs = {}
-        if favor == "precision":
-            dynamic_kwargs["favor_precision"] = True
-        elif favor == "recall":
-            dynamic_kwargs["favor_recall"] = True
+            dynamic_kwargs = {}
+            if favor == "precision":
+                dynamic_kwargs["favor_precision"] = True
+            elif favor == "recall":
+                dynamic_kwargs["favor_recall"] = True
 
-        content = extract(**common_kwargs, **dynamic_kwargs)
+            content = extract(**common_kwargs, **dynamic_kwargs)
 
-    if method == "raw" or not content:
-        content = str(soup)
+        if method == "raw" or not content:
+            content = str(soup)
 
-    filename = create_filename_from_meta(soup, url, title)
+        filename = create_filename_from_meta(soup, url, title)
 
-    markdown = CustomConverter(
-        heading_style="ATX", bs4_options="lxml", newline_style="BACKSLASH", strip=strip_tag, autolinks=False
-    ).convert(content)
+        markdown = CustomConverter(
+            heading_style="ATX", bs4_options="lxml", newline_style="BACKSLASH", strip=list(strip_tag), autolinks=False
+        ).convert(content)
 
-    output_file = Path(f"{filename}.md")
-    with open(output_file, "w", encoding="utf-8") as f:
-        f.write(markdown)
+        output_file = Path(f"{filename}.md")
+        with open(output_file, "w", encoding="utf-8") as f:
+            f.write(markdown)
 
 
 if __name__ == "__main__":
