@@ -1,6 +1,6 @@
 [project]
 name = "article-to-md"
-version = "0.5.0"
+version = "0.6.0"
 description = "Convert an article or web page to Markdown"
 readme = "README.md"
 authors = [
@@ -20,14 +20,14 @@ classifiers = [
 ]
 dependencies = [
     "curl-cffi>=0.15.0",
-    "cyclopts~=4.12.0",
+    "cyclopts>=4.12.0",
     "html-to-markdown<3.0.0",
-    "lxml>=6.1.0",
-    "markdownify~=1.2.2",
+    "lxml>=6.1.1",
+    "markdownify>=1.2.2",
     "readabilipy",
     "requests>=2.34.2",
     "requests-cache>=1.3.2",
-    "trafilatura>=2.0.0",
+    "trafilatura>=2.1.0",
     "unidecode>=1.4.0",
 ]
 

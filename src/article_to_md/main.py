@@ -1,4 +1,5 @@
 import re
+import sys
 import warnings
 from datetime import UTC, datetime
 from pathlib import Path
@@ -64,6 +65,7 @@ def main(
     favor: FavorChoice | None = None,
     remove_ads: bool = False,
     strip_tag: Annotated[tuple[str, ...], Parameter(negative="--no-strip")] = ("img",),
+    output: Annotated[Path | None, Parameter(name=["-o", "--output"])] = None,
 ):
     """
     Convert an article or web page to Markdown.
@@ -80,7 +82,18 @@ def main(
         Apply EasyList cosmetic filters to remove ads before processing.
     strip_tag : tuple[str, ...], optional
         HTML tag to strip from the final output. Repeat this flag to remove multiple tags. Use --no-strip to disable.
+    output : Path, optional
+        Output file path, directory, or '-' for stdout. If not specified, an auto-generated file name is used.
     """
+    write_to_stdout = output == Path("-")
+
+    if output and not write_to_stdout:
+        if len(sources) > 1 and not output.is_dir():
+            print(
+                "Error: A single output file path cannot be used with multiple sources. Please specify a directory.",
+                file=sys.stderr,
+            )
+            raise SystemExit(1)
 
     for source in sources:
         parsed = urlparse(source)
@@ -95,7 +108,7 @@ def main(
             path = Path(source)
             url = path.name
             if not path.exists():
-                print(f"Error: File or URL not found: {source}")
+                print(f"Error: File or URL not found: {source}", file=sys.stderr)
                 raise SystemExit(1)
 
             html = path.read_text(encoding="utf-8")
@@ -138,9 +151,21 @@ def main(
             heading_style="ATX", bs4_options="lxml", newline_style="BACKSLASH", strip=list(strip_tag), autolinks=False
         ).convert(content)
 
-        output_file = Path(f"{filename}.md")
-        with open(output_file, "w", encoding="utf-8") as f:
-            f.write(markdown)
+        if write_to_stdout:
+            sys.stdout.write(markdown)
+            if len(sources) > 1 and source != sources[-1]:
+                sys.stdout.write("\n\n")
+        else:
+            gen_filename = f"{create_filename_from_meta(soup, url, title)}.md"
+
+            if output is None:
+                target_path = Path(gen_filename)
+            elif output.is_dir():
+                target_path = output / gen_filename
+            else:
+                target_path = output
+
+            target_path.write_text(markdown, encoding="utf-8")
 
 
 if __name__ == "__main__":
