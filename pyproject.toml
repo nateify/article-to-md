@@ -1,6 +1,6 @@
 [project]
 name = "article-to-md"
-version = "0.6.0"
+version = "0.6.1"
 description = "Convert an article or web page to Markdown"
 readme = "README.md"
 authors = [

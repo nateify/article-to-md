@@ -9,6 +9,7 @@ from urllib.parse import urlparse
 import curl_cffi
 from bs4 import BeautifulSoup, XMLParsedAsHTMLWarning
 from cyclopts import App, Parameter
+from cyclopts.types import StdioPath
 from readabilipy import simple_json_from_html_string
 from trafilatura import extract
 from unidecode import unidecode
@@ -65,7 +66,7 @@ def main(
     favor: FavorChoice | None = None,
     remove_ads: bool = False,
     strip_tag: Annotated[tuple[str, ...], Parameter(negative="--no-strip")] = ("img",),
-    output: Annotated[Path | None, Parameter(name=["-o", "--output"])] = None,
+    output: Annotated[StdioPath | None, Parameter(name=["-o", "--output"])] = None,
 ):
     """
     Convert an article or web page to Markdown.
@@ -82,10 +83,10 @@ def main(
         Apply EasyList cosmetic filters to remove ads before processing.
     strip_tag : tuple[str, ...], optional
         HTML tag to strip from the final output. Repeat this flag to remove multiple tags. Use --no-strip to disable.
-    output : Path, optional
+    output : StdioPath, optional
         Output file path, directory, or '-' for stdout. If not specified, an auto-generated file name is used.
     """
-    write_to_stdout = output == Path("-")
+    write_to_stdout = output == StdioPath("-")
 
     if output and not write_to_stdout:
         if len(sources) > 1 and not output.is_dir():
